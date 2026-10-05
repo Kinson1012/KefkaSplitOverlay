@@ -8,8 +8,16 @@ public partial class App : Application
  protected override void OnStartup(StartupEventArgs e)
  {
   base.OnStartup(e);
-  _controller = new OverlayController();
+  StartOverlay();
+ }
+ // A single initialization path also lets the Windows harness use temporary
+ // settings without racing WPF's queued startup callback.
+ public OverlayController StartOverlay(SettingsStore? settingsStore = null)
+ {
+  if (_controller != null) return _controller;
+  _controller = new OverlayController(settingsStore);
   _controller.Start();
+  return _controller;
  }
  protected override void OnExit(ExitEventArgs e)
  {
