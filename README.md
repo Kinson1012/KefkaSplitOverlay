@@ -1,0 +1,131 @@
+# Kefka Split Overlay
+
+A personal, independent adaptation of
+[AweiYourdog's FF14-Kefka-P4-for-PC](https://github.com/AweiYourdog/FF14-Kefka-P4-for-PC).
+Windows / C# / .NET 8 / WPF / GPL-3.0.
+
+## What changed
+
+- **Trigger window:** a compact five-column, five-row hotbar with square
+  buttons, a blank middle column and all 18 original Flow inputs.
+- **Results window:** only the eight calculated results, in resolution order.
+- **Compact mode:** press `▣` in either title bar to hide both windows and show
+  one **48 × 48 DIP** K icon. One click restores both windows at their saved
+  locations and sizes. Drag the icon to reposition it; dragging does not restore.
+- Drag either title bar independently; resize either window from its edges.
+  Content scales uniformly so the trigger tiles remain square.
+- Settings save language, opacity, layout lock, positions, sizes and whether
+  the app was compact. Current encounter selections deliberately do not persist
+  between app launches. They do persist through hide/show and language changes.
+- Use **Recover positions** in Settings or the icon's right-click menu after a
+  monitor/layout change. Restored windows are also clamped to a connected monitor.
+- Three upstream icons are packaged as PNG, removing the WebP codec dependency.
+
+The default trigger size is **284 × 318 DIP**, close to the supplied reference's
+near-square hotbar proportions. Windows display scaling can change its physical
+pixel dimensions. The result window starts at 232 × 416 DIP.
+
+This build uses the original **Flow** mechanic rules. The upstream Pikmin and
+Beta interfaces are not included. It takes manual input only and does not read
+game memory, logs or network traffic.
+
+## Hotbar mapping
+
+The middle column is blank. `✓` means true; `✕` means false. Hover a tile for its
+meaning. A highlighted tile is selected. Reset clears the current encounter,
+retaining the upstream Line/Cone defaults.
+
+| Row | Column 1 | Column 2 | Column 3 | Column 4 | Column 5 |
+| --- | --- | --- | --- | --- | --- |
+| 1 | GC1 true (A) | GC1 false (B) | Gap | GC2 true (J) | GC2 false (K) |
+| 2 | GC1 short (C) | GC1 long (D) | Gap | Bomb from GC1 (E) | Bomb from GC2 (L) |
+| 3 | E/F1 true (F) | E/F1 false (G) | Gap | E/F2 true (M) | E/F2 false (N) |
+| 4 | Fire debuff (H) | Water debuff (I) | Gap | Line true (O) | Line false (P) |
+| 5 | Empty | Empty | Gap | Cone true (Q) | Cone false (R) |
+
+Letters are source identifiers, not keyboard shortcuts. C/D also determine the
+complementary GC2 timing, exactly as in upstream. O/Q start selected; the final
+result therefore initially says **Avoid Both**. This is an upstream default,
+not automatic encounter detection.
+
+## Run / build
+
+Use FFXIV in borderless-windowed mode. Windows gameplay testing is still needed
+for this adaptation, particularly focus, drag/resize and multi-monitor DPI.
+
+Install the **.NET 8 SDK** on Windows, open PowerShell in this folder, and run:
+
+```powershell
+dotnet run --project UMADOverlay/UMADOverlay.csproj
+```
+
+Create the standalone Windows x64 build (the resulting app does not require a
+separate .NET runtime installation):
+
+```powershell
+dotnet publish UMADOverlay/UMADOverlay.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:PublishTrimmed=false -o dist/app
+```
+
+Run `dist/app/KefkaSplitOverlay.exe`. Publish trimming is deliberately disabled
+for WPF. Before distributing an executable, include `LICENSE`, `NOTICE.md` and
+the complete corresponding source. The included GitHub workflow packages these
+together automatically.
+
+Preferences are stored in `%LOCALAPPDATA%/KefkaSplitOverlay/settings.json`.
+Corrupt/unreadable settings fall back to defaults; write errors are reported in
+Settings. Exit the app before manually editing or deleting the settings file.
+
+## Use your own GitHub repository without forking
+
+Create an **empty repository** in your own account, then use its URL below.
+Do not create a README or licence on GitHub first, since both are already here.
+
+```powershell
+git init
+git add .
+git commit -m "Create personal Kefka split overlay from attributed GPL upstream"
+git branch -M main
+git remote add origin https://github.com/YOUR_ACCOUNT/YOUR_REPOSITORY.git
+git push -u origin main
+```
+
+This is a standalone source copy, with no upstream `.git` history or remote.
+Keep `LICENSE` and attribution when redistributing. A GitHub fork relationship
+is not required by GPL-3.0; its source and licence obligations still apply.
+
+After pushing, open **Actions → Build Windows app**. A successful run provides
+the **KefkaSplitOverlay-Windows-x64** artifact, containing the app, notices and
+matching source. This workflow uploads a build artifact; it does not publish a
+public Release automatically.
+
+## Tests and verification status
+
+```powershell
+dotnet run --project tests/CoreTests -c Release
+dotnet run --project tests/OverlaySmokeTests -c Release
+```
+
+- CoreTests checks 8,748 Flow input combinations, selection toggles,
+  translations, and preferences round-trip/corruption handling.
+- OverlaySmokeTests checks WPF resource loading, both windows opening,
+  hide/restore, shared selections, language updates, tile uniqueness and locks.
+- The creation environment could not access a .NET SDK or Windows desktop.
+  These C# tests are supplied **but have not been executed there**. The Windows
+  workflow must pass before treating this build as verified.
+- Static checks confirm XML validity, packaged image resources, all input
+  mappings, centre-gap geometry, and byte-for-byte preservation of the upstream
+  Flow rule source. They do not independently validate FFXIV encounter strategy.
+
+### Manual Windows acceptance checks
+
+1. Click inputs in the trigger window and confirm immediate results in the other.
+2. Move and resize the windows independently; confirm square tiles stay square.
+3. Click `▣`: only one K icon remains. Click K: both windows return with selections.
+4. Drag K: it moves without expanding. Test its right-click recovery and exit.
+5. Select each language; check results, labels, and tooltips remain usable.
+6. Restart: geometry/preferences return, encounter selections start fresh.
+7. Test clicks during gameplay: normal overlay buttons should not take keyboard
+   focus. The separate Settings window intentionally accepts focus.
+8. Test Windows display scaling and disconnecting a secondary monitor.
+
+See `NOTICE.md` for provenance and modification details.

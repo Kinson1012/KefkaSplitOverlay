@@ -1,0 +1,33 @@
+name: Build Windows app
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Test mechanic combinations and settings
+        run: dotnet run --project tests/CoreTests -c Release
+      - name: Build WPF application
+        run: dotnet build UMADOverlay/UMADOverlay.csproj -c Release
+      - name: Test WPF resources and paired windows
+        run: dotnet run --project tests/OverlaySmokeTests -c Release
+      - name: Publish standalone Windows x64 executable
+        run: dotnet publish UMADOverlay/UMADOverlay.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:PublishTrimmed=false -o dist/app
+      - name: Include licence, attribution and corresponding source
+        shell: pwsh
+        run: |
+          Copy-Item LICENSE,NOTICE.md,README.md,UPSTREAM-README.md dist/app/
+          git archive --format=zip --output=dist/app/Corresponding-Source.zip HEAD
+      - uses: actions/upload-artifact@v4
+        with:
+          name: KefkaSplitOverlay-Windows-x64
+          path: dist/app/
+          if-no-files-found: error
