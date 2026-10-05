@@ -20,7 +20,7 @@ public sealed class HotbarTile
   Key = key; Caption = caption; Glyph = glyph; Description = description;
   Row = row; Column = column; State = state;
   Accent = (Brush)new BrushConverter().ConvertFromString(accent)!;
-  ImagePath = image == null ? null : "pack://application:,,,/Assets/" + image;
+  ImagePath = image == null ? null : "pack://application:,,,/KefkaSplitOverlay;component/Assets/" + image;
  }
 }
 public sealed class ResultItem : ViewModelBase
