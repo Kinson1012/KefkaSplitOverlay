@@ -8,12 +8,18 @@ using UMADOverlay.Views;
 
 internal static class Program
 {
+    // The test owns its controller and temporary settings. Suppress the queued
+    // production startup callback, which would create a second set of windows.
+    private sealed class HarnessApp : App
+    {
+        protected override void OnStartup(StartupEventArgs e) { }
+    }
     private static void Check(bool condition,string message) { if (!condition) throw new Exception(message); }
     private static void Pump() => Application.Current.Dispatcher.Invoke(() => { },DispatcherPriority.ApplicationIdle);
     [STAThread]
     private static int Main()
     {
-        var app = new App(); app.InitializeComponent();
+        var app = new HarnessApp(); app.InitializeComponent();
         string folder=Path.Combine(Path.GetTempPath(),"KefkaSmoke-"+Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(folder);
         try
