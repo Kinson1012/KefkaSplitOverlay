@@ -1,0 +1,56 @@
+name: Release v1.0.0
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/release-v1.0.0.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: release-v1.0.0
+  cancel-in-progress: false
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 2d4ec17d32eabd2016436e26f33fcf735f1475ee
+      - name: Download the tested Windows build
+        uses: actions/download-artifact@v4
+        with:
+          name: KefkaSplitOverlay-Windows-x64
+          path: dist/app
+          run-id: 37339402101
+          github-token: ${{ github.token }}
+      - name: Package and publish release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Compress-Archive -Path dist/app/* -DestinationPath dist/KefkaSplitOverlay-v1.0.0-Windows-x64.zip
+          @'
+          Separate input and result overlays with the compact grouped input layout.
+
+          - GC1/GC2 on the left, water/fire in the middle, and bombs on the right.
+          - Original Chinese labels, icons, and mechanic logic preserved.
+          - High-contrast backgrounds, white labels, and yellow results.
+          - Collapse both overlays to a small icon; click it to restore both.
+          - Saved window positions and settings.
+
+          Download and extract KefkaSplitOverlay-v1.0.0-Windows-x64.zip, then run KefkaSplitOverlay.exe. The Windows x64 build is self-contained and includes GPL-3.0 licence, attribution, and corresponding source.
+
+          Validation: Windows build, mechanic combinations/settings tests, and WPF resources/paired-window smoke tests passed in build run 37339402101.
+          '@ | Set-Content -Path dist/release-notes.md -Encoding utf8
+          gh release view v1.0.0 *> $null
+          if ($LASTEXITCODE -ne 0) {
+            gh release create v1.0.0 --target 2d4ec17d32eabd2016436e26f33fcf735f1475ee --title "v1.0.0 — Split overlays with grouped input layout" --notes-file dist/release-notes.md --draft
+            if ($LASTEXITCODE -ne 0) { throw 'Release creation failed' }
+          }
+          gh release upload v1.0.0 dist/KefkaSplitOverlay-v1.0.0-Windows-x64.zip --clobber
+          if ($LASTEXITCODE -ne 0) { throw 'Release asset upload failed' }
+          gh release edit v1.0.0 --draft=false --latest
+          if ($LASTEXITCODE -ne 0) { throw 'Release publication failed' }
