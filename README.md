@@ -1,144 +1,111 @@
-# Kefka Split Overlay
+# Kefka Split Overlay 使用教學
 
-A personal, independent adaptation of
-[AweiYourdog's FF14-Kefka-P4-for-PC](https://github.com/AweiYourdog/FF14-Kefka-P4-for-PC).
-Windows / C# / .NET 8 / WPF / GPL-3.0.
+FFXIV Kefka P4 手動機制提示工具。輸入按鈕與結果分成兩個獨立浮動視窗，可各自移動、調整大小，也可以一起縮成小圖示。
 
-## What changed
+本版本保留原版 Flow 的文字、圖示及判定邏輯，需要你根據場上機制手動點選。
 
-- **Trigger window:** the original wording/icons in a compact grouped layout:
-  GC1 + Water/Fire 1 above GC2 + Water/Fire 2, with Thunder/Ice below and
-  the two bomb buttons in a narrow column on the right.
-- **Results window:** only the eight calculated results, in resolution order.
-- **Compact mode:** press `▣` in either title bar to hide both windows and show
-  one **48 × 48 DIP** K icon. One click restores both windows at their saved
-  locations and sizes. Drag the icon to reposition it; dragging does not restore.
-- Drag either title bar independently; resize either window from its edges.
-  Content scales uniformly while preserving the grouped arrangement.
-- Settings save language, opacity, layout lock, positions, sizes and whether
-  the app was compact. Current encounter selections deliberately do not persist
-  between app launches. They do persist through hide/show and language changes.
-- Use **Recover positions** in Settings or the icon's right-click menu after a
-  monitor/layout change. Restored windows are also clamped to a connected monitor.
-- Three upstream icons are packaged as PNG, removing the WebP codec dependency.
+## 1. 下載及啟動
 
-The default trigger size is **384 × 262 DIP**, following the latest layout sketch. Windows display scaling can change its physical
-pixel dimensions. The result window starts at 232 × 416 DIP.
+1. 前往 [最新版本下載頁面](https://github.com/Kinson1012/KefkaSplitOverlay/releases/latest)。
+2. 在 **Assets** 下載名稱以 **Windows-x64.zip** 結尾的檔案，例如 `KefkaSplitOverlay-v1.0.0-Windows-x64.zip`。請選擇這個執行檔套件；`Source code` 是原始碼。
+3. 將 ZIP **完整解壓縮**到你想存放程式的資料夾。
+4. 開啟資料夾，雙擊 **`KefkaSplitOverlay.exe`**。
 
-This build uses the original **Flow** mechanic rules. The upstream Pikmin and
-Beta interfaces are not included. It takes manual input only and does not read
-game memory, logs or network traffic.
+適用於 Windows x64，免安裝，亦不需要另行安裝 .NET 執行環境。使用時可將 FFXIV 設為「無邊框視窗」模式，方便查看浮動視窗。
 
-## Hotbar mapping
+如果啟動後只看到 **K** 小圖示，點一下即可同時展開輸入及結果視窗。
 
-The inputs use the original Flow labels and icons, grouped as in the latest sketch. Blue circles mean true;
-red question marks mean false. The original icon artwork is unchanged.
+## 2. 認識兩個視窗
 
-| Section, in order | Inputs, left to right |
+- **KEFKA · INPUT：輸入視窗**，根據機制點選按鈕。
+- **KEFKA · RESULTS：結果視窗**，每次點選後會即時更新提示。
+
+輸入視窗的排列如下：
+
+| 左側 | 中間 | 右側 |
+| --- | --- | --- |
+| GC1（真／假、早／晚） | 水火1（真／假、水／火圖示） | GC1 炸彈圖示 |
+| GC2（真／假） | 水火2（真／假） | GC2 炸彈圖示 |
+| 雷直線（真／假） | 冰扇形（真／假） | — |
+
+## 3. 點選機制、查看結果
+
+1. 每次新一輪開始前，按輸入視窗右上角的 **↺**，重置上一輪選擇。
+2. 根據場上機制，在對應區域點選：
+   - **藍色圓形 ●：真**。
+   - **紅色問號 ?：假**。
+   - **早／晚：**選擇 GC1 對應的 debuff 時間。
+   - **水／火圖示：**選擇自己的 debuff。
+   - **右側炸彈圖示：**點選對應 GC1 或 GC2 的炸彈。
+3. **黃色外框及藍色背景**代表按鈕已選取。同組互斥選項會自動切換。
+4. 查看結果視窗，依「炸彈 → 早 debuff → 晚 debuff → 魔法放出」的排列閱讀黃色提示。
+
+滑鼠停留在按鈕上，可查看該按鈕的說明。GC1 的早／晚選擇會依原版規則影響 GC2 的對應時間。
+
+GC、水火、早／晚及炸彈按鈕可再次點擊以取消選取。雷直線和冰扇形則會保留一個選項：預設為「真」，再次點擊已選取的「假」會回到「真」。
+
+> 啟動或重置後，雷直線與冰扇形預設選取「真」，所以魔法放出可能先顯示「都要躲」。這是程式預設值，請按實際機制調整。結果中的「—」表示目前沒有對應提示。
+
+## 4. 縮成圖示、還原視窗
+
+在任一視窗右上角按 **▣**，兩個視窗會一起隱藏，留下約 **48 × 48** 的 **K** 小圖示。
+
+- **點一下 K：**同時還原兩個視窗，保留本輪選擇。
+- **拖動 K：**移動圖示位置。
+- **右鍵點 K：**開啟選單，可還原視窗、開啟設定、重置位置或結束程式。
+
+縮小與還原不會清除本輪輸入。
+
+## 5. 移動、調整大小及設定
+
+**移動視窗：**拖動上方標題列。兩個視窗可以分別擺放。
+
+**調整大小：**拖動視窗邊緣或角落；內容會按比例縮放。
+
+按 **⚙** 開啟設定：
+
+| 設定項目 | 用途 |
 | --- | --- |
-| GC1 | Blue circle / red ?; early / late; bomb icon |
-| Water/Fire 1 | Blue circle / red ?; water icon / fire icon |
-| GC2 | Blue circle / red ?; bomb icon |
-| Water/Fire 2 | Blue circle / red ? |
-| Thunder line | Blue circle / red ? |
-| Ice cone | Blue circle / red ? |
+| Language / 語言 / 言語 | 切換繁體中文、日本語或 English |
+| Background opacity / 背景不透明度 | 調整背景；100% 最清晰 |
+| Lock window positions and sizes / 鎖定位置及大小 | 固定兩個視窗，避免誤移或誤改大小 |
+| Recover positions / 重置視窗位置及大小 | 將視窗移回主螢幕並恢復預設大小 |
+| Collapse to icon / 縮成圖示 | 同時縮小兩個視窗 |
+| Close settings / 關閉設定 | 關閉設定視窗 |
+| Exit application / 結束程式 | 完全關閉程式 |
 
-Layout: first row GC1 / Water-Fire 1 / GC1 bomb; second row GC2 / Water-Fire 2 / GC2 bomb; bottom row Thunder / Ice.
+若無法移動或調整大小，先確認「鎖定位置及大小」沒有勾選。
 
-Group headings and early/late wording come directly from the original translation
-properties. Hover a button for its meaning. Selection is marked by a yellow
-border and blue background. Result headings and number/fire/water labels also
-come from the original Flow interface.
+## 6. 重置及結束程式
 
-The updated appearance defaults to opaque black backgrounds, white labels and
-bright yellow result text. Existing preferences are upgraded to an opaque
-background once; positions and language are retained. The input window is resized to the new
-proportions once on upgrade; later custom sizes are retained. You can still
-adjust opacity in Settings afterwards. Result rows remain opaque for readability.
+- **↺：**重置本輪機制選擇，保留視窗位置與設定。
+- **×：**位於輸入視窗右上角，用來結束整個程式。
+- 也可透過設定中的 **Exit application**，或 K 圖示右鍵選單的 **Exit** 結束。
 
-Letters are source identifiers, not keyboard shortcuts. C/D also determine the
-complementary GC2 timing, exactly as in upstream. O/Q start selected; the final
-result therefore initially says **Avoid Both**. This is an upstream default,
-not automatic encounter detection.
+程式會自動保存語言、背景不透明度、鎖定狀態、視窗位置與大小，以及是否縮成圖示。**本輪機制選擇不會保留到下次啟動**。
 
-## Run / build
+## 7. 常見問題
 
-Use FFXIV in borderless-windowed mode. Windows gameplay testing is still needed
-for this adaptation, particularly focus, drag/resize and multi-monitor DPI.
+### 找不到視窗，或更換螢幕後位置不對
 
-Install the **.NET 8 SDK** on Windows, open PowerShell in this folder, and run:
+在設定中按 **Recover positions / 重置視窗位置及大小**。如果只看到 K 圖示，可右鍵選擇 **Recover window positions**，程式會還原兩個視窗。
 
-```powershell
-dotnet run --project UMADOverlay/UMADOverlay.csproj
+### 想恢復所有預設設定
+
+先結束程式，在檔案總管的地址列輸入：
+
+```text
+%LOCALAPPDATA%\KefkaSplitOverlay
 ```
 
-Create the standalone Windows x64 build (the resulting app does not require a
-separate .NET runtime installation):
+刪除資料夾中的 `settings.json`，再啟動程式即可。
 
-```powershell
-dotnet publish UMADOverlay/UMADOverlay.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:PublishTrimmed=false -o dist/app
-```
+### 如何更新版本？
 
-Run `dist/app/KefkaSplitOverlay.exe`. Publish trimming is deliberately disabled
-for WPF. Before distributing an executable, include `LICENSE`, `NOTICE.md` and
-the complete corresponding source. The included GitHub workflow packages these
-together automatically.
+先結束舊程式，再下載及完整解壓縮新版本，執行新的 `KefkaSplitOverlay.exe`。設定存放在上面的獨立資料夾，通常會自動沿用。
 
-Preferences are stored in `%LOCALAPPDATA%/KefkaSplitOverlay/settings.json`.
-Corrupt/unreadable settings fall back to defaults; write errors are reported in
-Settings. Exit the app before manually editing or deleting the settings file.
+## 來源及授權
 
-## Use your own GitHub repository without forking
+改編自 [AweiYourdog / FF14-Kefka-P4-for-PC](https://github.com/AweiYourdog/FF14-Kefka-P4-for-PC)，採用 **GPL-3.0** 授權。原作者聲明與修改說明見 [NOTICE.md](NOTICE.md)，授權全文見 [LICENSE](LICENSE)。
 
-Create an **empty repository** in your own account, then use its URL below.
-Do not create a README or licence on GitHub first, since both are already here.
-
-```powershell
-git init
-git add .
-git commit -m "Create personal Kefka split overlay from attributed GPL upstream"
-git branch -M main
-git remote add origin https://github.com/YOUR_ACCOUNT/YOUR_REPOSITORY.git
-git push -u origin main
-```
-
-This is a standalone source copy, with no upstream `.git` history or remote.
-Keep `LICENSE` and attribution when redistributing. A GitHub fork relationship
-is not required by GPL-3.0; its source and licence obligations still apply.
-
-After pushing, open **Actions → Build Windows app**. A successful run provides
-the **KefkaSplitOverlay-Windows-x64** artifact, containing the app, notices and
-matching source. This workflow uploads a build artifact; it does not publish a
-public Release automatically.
-
-## Tests and verification status
-
-```powershell
-dotnet run --project tests/CoreTests -c Release
-dotnet run --project tests/OverlaySmokeTests -c Release
-```
-
-- CoreTests checks 8,748 Flow input combinations, selection toggles,
-  translations, and preferences round-trip/corruption handling.
-- OverlaySmokeTests checks WPF resource loading, both windows opening,
-  hide/restore, shared selections, language updates, tile uniqueness and locks.
-- The creation environment could not access a .NET SDK or Windows desktop.
-  These C# tests are supplied **but have not been executed there**. The Windows
-  workflow must pass before treating this build as verified.
-- Static checks confirm XML validity, packaged image resources, all input
-  mappings, original Flow order and icons, and byte-for-byte preservation of the upstream
-  Flow rule source. They do not independently validate FFXIV encounter strategy.
-
-### Manual Windows acceptance checks
-
-1. Click inputs in the trigger window and confirm immediate results in the other.
-2. Move and resize the windows independently; confirm the Flow layout scales without reordering.
-3. Click `▣`: only one K icon remains. Click K: both windows return with selections.
-4. Drag K: it moves without expanding. Test its right-click recovery and exit.
-5. Select each language; check results, labels, and tooltips remain usable.
-6. Restart: geometry/preferences return, encounter selections start fresh.
-7. Test clicks during gameplay: normal overlay buttons should not take keyboard
-   focus. The separate Settings window intentionally accepts focus.
-8. Test Windows display scaling and disconnecting a secondary monitor.
-
-See `NOTICE.md` for provenance and modification details.
+發布套件附有對應原始碼 `Corresponding-Source.zip`。
