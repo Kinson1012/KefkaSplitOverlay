@@ -9,6 +9,7 @@ public sealed class WindowPlacement
 }
 public sealed class UserSettings
 {
+ public int InputLayoutVersion { get; set; }
  public int AppearanceVersion { get; set; }
  public Lang Language { get; set; } = Lang.ZH;
  public double BackgroundOpacity { get; set; } = 1.0;

@@ -30,7 +30,7 @@ public sealed class OverlayController
         double left = screen.Left + Math.Max(8, (screen.Width - 540) / 2);
         double top = screen.Top + Math.Max(8, (screen.Height - 420) / 2);
         _triggers.Restore(Settings.Triggers, left, top);
-        _results.Restore(Settings.Results, left + 300, top);
+        _results.Restore(Settings.Results, left + TriggerWindow.DefaultWidth + 16, top);
         _launcher.Restore(Settings.Launcher, left, top);
 
         _triggers.AddAction("↺", "Reset mechanic selections", ViewModel.Reset);
@@ -98,10 +98,10 @@ public sealed class OverlayController
     {
         var screen = SystemParameters.WorkArea;
         double left = screen.Left + 32, top = screen.Top + 64;
-        _triggers.Width = 284; _triggers.Height = 318;
+        _triggers.Width = TriggerWindow.DefaultWidth; _triggers.Height = TriggerWindow.DefaultHeight;
         _results.Width = 232; _results.Height = 416;
         _triggers.Left = left; _triggers.Top = top;
-        _results.Left = left + 300; _results.Top = top;
+        _results.Left = left + TriggerWindow.DefaultWidth + 16; _results.Top = top;
         _launcher.Left = left; _launcher.Top = top;
         Expand();
     }

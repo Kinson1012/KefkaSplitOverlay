@@ -42,6 +42,13 @@ internal static class Program
             Check(vm.Tiles.Where(t=>t.Key is "A" or "F" or "J" or "M" or "O" or "Q").All(t=>t.Glyph=="●"),"Original blue-circle icons");
             Check(vm.Tiles.Where(t=>t.Key is "B" or "G" or "K" or "N" or "P" or "R").All(t=>t.Glyph=="?"),"Original question-mark icons");
             Check(controller.Settings.BackgroundOpacity==1.0,"Opaque high-contrast default");
+            var body=(System.Windows.Controls.Grid)((System.Windows.Controls.Border)trigger.Content).Child;
+            var layout=(System.Windows.Controls.Grid)body.Children.OfType<System.Windows.Controls.Viewbox>().Single().Child;
+            Check(layout.ColumnDefinitions.Count==3 && layout.RowDefinitions.Count==3,"Three-column grouped layout");
+            var bombs=layout.Children.OfType<System.Windows.Controls.Button>().ToArray();
+            Check(bombs.Length==2 && bombs.All(b=>System.Windows.Controls.Grid.GetColumn(b)==2),"Separate right-side bomb column");
+            Check((string)bombs[0].CommandParameter=="E" && (string)bombs[1].CommandParameter=="L","Bombs retain GC1/GC2 order");
+            Check(layout.Children.OfType<System.Windows.Controls.Border>().Count()==6,"Six mechanic groups");
             vm.Mechanic.CmdClick.Execute("A");
             vm.Mechanic.CmdClick.Execute("E");
             Check(vm.Results[0].Answer=="不要動","Result window must share the trigger state");

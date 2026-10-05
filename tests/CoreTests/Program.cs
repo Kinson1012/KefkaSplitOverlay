@@ -61,7 +61,7 @@ Directory.CreateDirectory(folder);
 try
 {
     var store = new SettingsStore(Path.Combine(folder,"settings.json"));
-    var settings = new UserSettings { Language=Lang.EN, Compact=true, BackgroundOpacity=.65, AppearanceVersion=1,
+    var settings = new UserSettings { Language=Lang.EN, Compact=true, BackgroundOpacity=.65, AppearanceVersion=1, InputLayoutVersion=1,
         Triggers = new WindowPlacement { Left=-600, Top=80, Width=284, Height=318 } };
     store.Save(settings); Equal<string?>(null,store.LastError,"Save success");
     var loaded=store.Load(); Equal(Lang.EN,loaded.Language,"Stored language");
@@ -75,6 +75,12 @@ try
     loaded=store.Load(); Equal(1d,loaded.BackgroundOpacity,"Upgrade translucent theme");
     Equal(true,loaded.Compact,"Upgrade retains compact preference");
     Equal(1,loaded.AppearanceVersion,"Upgrade only applies once");
+    File.WriteAllText(store.FilePath,"{\"Triggers\":{\"Left\":123,\"Top\":456,\"Width\":284,\"Height\":318}}");
+    loaded=store.Load(); Equal(384d,loaded.Triggers!.Width,"Upgrade input proportions");
+    Equal(262d,loaded.Triggers.Height,"Upgrade input height");
+    Equal(123d,loaded.Triggers.Left,"Retain input position");
+    loaded.Triggers.Width=420; store.Save(loaded);
+    Equal(420d,store.Load().Triggers!.Width,"Do not repeat layout migration");
 }
 finally { Directory.Delete(folder,true); }
 Console.WriteLine($"PASS: {cases} mechanic combinations, toggles, translations and persistence.");

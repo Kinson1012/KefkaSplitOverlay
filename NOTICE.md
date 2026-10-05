@@ -35,3 +35,8 @@ blue circles/red question marks, water-left/fire-right placement, original label
 and section headings. The reference screenshot now governs only window size
 and proportions. Increased contrast with opaque black result rows, white labels
 and yellow answers, and upgraded existing translucent preferences once.
+
+Later revision **2026-10-06**: arranged the same Flow inputs into the user's
+three-row sketch, placing both GC and Water/Fire groups side by side and bomb
+buttons in a separate right-hand column. Added one-time size migration while
+retaining saved positions.

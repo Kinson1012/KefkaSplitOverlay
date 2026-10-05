@@ -6,15 +6,15 @@ Windows / C# / .NET 8 / WPF / GPL-3.0.
 
 ## What changed
 
-- **Trigger window:** the original vertical Flow sequence and the original
-  wording/icons, fitted into a compact 284 × 318 DIP window. The screenshot
-  reference controls the outer size/proportions, not the input arrangement.
+- **Trigger window:** the original wording/icons in a compact grouped layout:
+  GC1 + Water/Fire 1 above GC2 + Water/Fire 2, with Thunder/Ice below and
+  the two bomb buttons in a narrow column on the right.
 - **Results window:** only the eight calculated results, in resolution order.
 - **Compact mode:** press `▣` in either title bar to hide both windows and show
   one **48 × 48 DIP** K icon. One click restores both windows at their saved
   locations and sizes. Drag the icon to reposition it; dragging does not restore.
 - Drag either title bar independently; resize either window from its edges.
-  Content scales uniformly while preserving the original Flow arrangement.
+  Content scales uniformly while preserving the grouped arrangement.
 - Settings save language, opacity, layout lock, positions, sizes and whether
   the app was compact. Current encounter selections deliberately do not persist
   between app launches. They do persist through hide/show and language changes.
@@ -22,8 +22,7 @@ Windows / C# / .NET 8 / WPF / GPL-3.0.
   monitor/layout change. Restored windows are also clamped to a connected monitor.
 - Three upstream icons are packaged as PNG, removing the WebP codec dependency.
 
-The default trigger size is **284 × 318 DIP**, close to the supplied reference's
-near-square reference proportions. Windows display scaling can change its physical
+The default trigger size is **384 × 262 DIP**, following the latest layout sketch. Windows display scaling can change its physical
 pixel dimensions. The result window starts at 232 × 416 DIP.
 
 This build uses the original **Flow** mechanic rules. The upstream Pikmin and
@@ -32,7 +31,7 @@ game memory, logs or network traffic.
 
 ## Hotbar mapping
 
-The inputs follow the upstream Flow from top to bottom. Blue circles mean true;
+The inputs use the original Flow labels and icons, grouped as in the latest sketch. Blue circles mean true;
 red question marks mean false. The original icon artwork is unchanged.
 
 | Section, in order | Inputs, left to right |
@@ -44,6 +43,8 @@ red question marks mean false. The original icon artwork is unchanged.
 | Thunder line | Blue circle / red ? |
 | Ice cone | Blue circle / red ? |
 
+Layout: first row GC1 / Water-Fire 1 / GC1 bomb; second row GC2 / Water-Fire 2 / GC2 bomb; bottom row Thunder / Ice.
+
 Group headings and early/late wording come directly from the original translation
 properties. Hover a button for its meaning. Selection is marked by a yellow
 border and blue background. Result headings and number/fire/water labels also
@@ -51,7 +52,8 @@ come from the original Flow interface.
 
 The updated appearance defaults to opaque black backgrounds, white labels and
 bright yellow result text. Existing preferences are upgraded to an opaque
-background once; positions, sizes and language are retained. You can still
+background once; positions and language are retained. The input window is resized to the new
+proportions once on upgrade; later custom sizes are retained. You can still
 adjust opacity in Settings afterwards. Result rows remain opaque for readability.
 
 Letters are source identifiers, not keyboard shortcuts. C/D also determine the

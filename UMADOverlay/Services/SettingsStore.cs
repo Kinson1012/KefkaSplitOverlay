@@ -14,13 +14,19 @@ public sealed class SettingsStore
  {
   try
   {
-   if (!File.Exists(FilePath)) return new() { AppearanceVersion=1 };
+   if (!File.Exists(FilePath)) return new() { AppearanceVersion=1, InputLayoutVersion=1 };
    var result = JsonSerializer.Deserialize<UserSettings>(File.ReadAllText(FilePath)) ?? new();
    if (!Enum.IsDefined(result.Language)) result.Language = Lang.ZH;
    result.BackgroundOpacity = double.IsFinite(result.BackgroundOpacity)
     ? Math.Clamp(result.BackgroundOpacity, 0.20, 1.0) : 1.0;
    // Upgrade the previous translucent theme once; keep the user's other preferences.
    if (result.AppearanceVersion<1) { result.BackgroundOpacity=1.0; result.AppearanceVersion=1; }
+   // Apply the new compact-wide proportions once, retaining the saved position.
+   if (result.InputLayoutVersion<1)
+   {
+    if (result.Triggers!=null) { result.Triggers.Width=384; result.Triggers.Height=262; }
+    result.InputLayoutVersion=1;
+   }
    return result;
   }
   catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException)
