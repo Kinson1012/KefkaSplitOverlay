@@ -29,3 +29,9 @@ Changes made **2026-10-05** for Kinson's requested personal layout:
 Existing author notices and the original licence are preserved. No ownership
 of the upstream work or third-party game assets is claimed. This software is
 provided without warranty; see `LICENSE`.
+
+Revision **2026-10-06** (Hong Kong): restored the original vertical Flow ordering,
+blue circles/red question marks, water-left/fire-right placement, original labels
+and section headings. The reference screenshot now governs only window size
+and proportions. Increased contrast with opaque black result rows, white labels
+and yellow answers, and upgraded existing translucent preferences once.

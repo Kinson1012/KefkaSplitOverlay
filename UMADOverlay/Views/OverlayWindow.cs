@@ -40,8 +40,8 @@ public class OverlayWindow : Window
         Content = _frame;
         Root.RowDefinitions.Add(new RowDefinition { Height = new GridLength(launcher ? 0 : 30) });
         Root.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
-        var header = new Grid { Background = Brush("#222C34") };
-        _title = new TextBlock { Text = title, Foreground = Brush("#E6D3A1"), FontSize = 10,
+        var header = new Grid { Background = Brush("#000000") };
+        _title = new TextBlock { Text = title, Foreground = Brush("#FFFFFF"), FontSize = 11,
             VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(8,0,0,0) };
         header.Children.Add(_title); header.Children.Add(Toolbar);
         header.MouseLeftButtonDown += (_, e) =>
@@ -59,12 +59,12 @@ public class OverlayWindow : Window
         LocationChanged += (_, _) => PlacementChanged?.Invoke();
         SizeChanged += (_, _) => PlacementChanged?.Invoke();
         Closing += (_, e) => { if (!AllowClose) { e.Cancel = true; ExitRequested?.Invoke(); } };
-        ApplyOpacity(0.8);
+        ApplyOpacity(1.0);
     }
 
     public void SetTitle(string text) { Title = text; _title.Text = text; }
     public void ApplyOpacity(double value) => _frame.Background = new SolidColorBrush(
-        Color.FromArgb((byte)(Math.Clamp(value, .2, 1) * 255), 23, 31, 38));
+        Color.FromArgb((byte)(Math.Clamp(value, .2, 1) * 255), 0, 0, 0));
     public static Brush Brush(string hex) => (Brush)new BrushConverter().ConvertFromString(hex)!;
 
     public Button AddAction(string label, string tooltip, Action action)

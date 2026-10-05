@@ -5,9 +5,9 @@
  <Application.Resources>
   <Style TargetType="Button">
    <Setter Property="Focusable" Value="False"/>
-   <Setter Property="Foreground" Value="#F4F1E7"/>
-   <Setter Property="Background" Value="#343C43"/>
-   <Setter Property="BorderBrush" Value="#7C8B91"/>
+   <Setter Property="Foreground" Value="#FFFFFF"/>
+   <Setter Property="Background" Value="#141414"/>
+   <Setter Property="BorderBrush" Value="#FFFFFF"/>
    <Setter Property="BorderThickness" Value="1"/>
    <Setter Property="Cursor" Value="Hand"/>
    <Setter Property="Padding" Value="5,2"/>

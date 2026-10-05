@@ -1,37 +1,39 @@
-// Added 2026-10-05. Independently positioned result-only overlay. GPL-3.0.
+// Modified 2026-10-06: opaque high-contrast rows and upstream Flow labels. GPL-3.0.
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 using UMADOverlay.ViewModels;
-
 namespace UMADOverlay.Views;
-
 public sealed class ResultsWindow : OverlayWindow
 {
-    private readonly StackPanel _rows = new() { Width = 210 };
-    private readonly SplitOverlayViewModel _vm;
-    public ResultsWindow(SplitOverlayViewModel vm) : base("KEFKA · RESULTS", 232, 416)
-    {
-        _vm = vm; DataContext = vm;
-        MinWidth = 180; MinHeight = 270;
-        SetBody(new Viewbox { Stretch = Stretch.Uniform, Margin = new Thickness(8), Child = _rows });
-        Rebuild();
-    }
-    public void Rebuild()
-    {
-        _rows.Children.Clear();
-        foreach (var item in _vm.Results)
-        {
-            var text = new StackPanel { Margin = new Thickness(8,4,8,4) };
-            text.Children.Add(new TextBlock { Text = item.Label, Foreground = Brush("#AAB9C3"), FontSize = 9 });
-            var answer = new TextBlock { FontSize = 17, FontWeight = FontWeights.SemiBold,
-                Foreground = Brush("#FFE0A0"), TextWrapping = TextWrapping.Wrap };
-            answer.SetBinding(TextBlock.TextProperty, new Binding(nameof(ResultItem.Answer)) { Source = item });
-            text.Children.Add(answer);
-            _rows.Children.Add(new Border { Child = text, MinHeight = 43, Margin = new Thickness(0,0,0,3),
-                BorderThickness = new Thickness(2,0,0,0), BorderBrush = Brush("#72899A"),
-                Background = Brush("#B3222C34"), CornerRadius = new CornerRadius(4) });
-        }
-    }
+ private readonly StackPanel _rows=new() { Width=210 };
+ private readonly SplitOverlayViewModel _vm;
+ public ResultsWindow(SplitOverlayViewModel vm) : base("KEFKA · RESULTS",232,416)
+ {
+  _vm=vm; DataContext=vm; MinWidth=180; MinHeight=270;
+  SetBody(new Viewbox { Stretch=Stretch.Uniform, Margin=new Thickness(8), Child=_rows });
+  Rebuild();
+ }
+ public void Rebuild()
+ {
+  _rows.Children.Clear();
+  foreach (var item in _vm.Results)
+  {
+   if (item.Header!=null) _rows.Children.Add(new TextBlock { Text=item.Header,
+    Foreground=Brush("#FFFFFF"), FontSize=13, FontWeight=FontWeights.Bold, Margin=new Thickness(0,4,0,3) });
+   var grid=new Grid { Margin=new Thickness(5,4,5,4) };
+   grid.ColumnDefinitions.Add(new ColumnDefinition { Width=new GridLength(26) });
+   grid.ColumnDefinitions.Add(new ColumnDefinition());
+   grid.Children.Add(new TextBlock { Text=item.Label, FontSize=14, FontWeight=FontWeights.Bold,
+    Foreground=Brush("#FFFFFF"), VerticalAlignment=VerticalAlignment.Center });
+   var answer=new TextBlock { FontSize=20, FontWeight=FontWeights.Bold,
+    Foreground=Brush("#FFFF00"), TextWrapping=TextWrapping.Wrap, VerticalAlignment=VerticalAlignment.Center };
+   answer.SetBinding(TextBlock.TextProperty,new Binding(nameof(ResultItem.Answer)) { Source=item });
+   Grid.SetColumn(answer,1); grid.Children.Add(answer);
+   _rows.Children.Add(new Border { Child=grid, MinHeight=36, Margin=new Thickness(0,0,0,2),
+    BorderThickness=new Thickness(1), BorderBrush=Brush("#777777"),
+    Background=Brush("#000000"), CornerRadius=new CornerRadius(3) });
+  }
+ }
 }

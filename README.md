@@ -6,14 +6,15 @@ Windows / C# / .NET 8 / WPF / GPL-3.0.
 
 ## What changed
 
-- **Trigger window:** a compact five-column, five-row hotbar with square
-  buttons, a blank middle column and all 18 original Flow inputs.
+- **Trigger window:** the original vertical Flow sequence and the original
+  wording/icons, fitted into a compact 284 × 318 DIP window. The screenshot
+  reference controls the outer size/proportions, not the input arrangement.
 - **Results window:** only the eight calculated results, in resolution order.
 - **Compact mode:** press `▣` in either title bar to hide both windows and show
   one **48 × 48 DIP** K icon. One click restores both windows at their saved
   locations and sizes. Drag the icon to reposition it; dragging does not restore.
 - Drag either title bar independently; resize either window from its edges.
-  Content scales uniformly so the trigger tiles remain square.
+  Content scales uniformly while preserving the original Flow arrangement.
 - Settings save language, opacity, layout lock, positions, sizes and whether
   the app was compact. Current encounter selections deliberately do not persist
   between app launches. They do persist through hide/show and language changes.
@@ -22,7 +23,7 @@ Windows / C# / .NET 8 / WPF / GPL-3.0.
 - Three upstream icons are packaged as PNG, removing the WebP codec dependency.
 
 The default trigger size is **284 × 318 DIP**, close to the supplied reference's
-near-square hotbar proportions. Windows display scaling can change its physical
+near-square reference proportions. Windows display scaling can change its physical
 pixel dimensions. The result window starts at 232 × 416 DIP.
 
 This build uses the original **Flow** mechanic rules. The upstream Pikmin and
@@ -31,17 +32,27 @@ game memory, logs or network traffic.
 
 ## Hotbar mapping
 
-The middle column is blank. `✓` means true; `✕` means false. Hover a tile for its
-meaning. A highlighted tile is selected. Reset clears the current encounter,
-retaining the upstream Line/Cone defaults.
+The inputs follow the upstream Flow from top to bottom. Blue circles mean true;
+red question marks mean false. The original icon artwork is unchanged.
 
-| Row | Column 1 | Column 2 | Column 3 | Column 4 | Column 5 |
-| --- | --- | --- | --- | --- | --- |
-| 1 | GC1 true (A) | GC1 false (B) | Gap | GC2 true (J) | GC2 false (K) |
-| 2 | GC1 short (C) | GC1 long (D) | Gap | Bomb from GC1 (E) | Bomb from GC2 (L) |
-| 3 | E/F1 true (F) | E/F1 false (G) | Gap | E/F2 true (M) | E/F2 false (N) |
-| 4 | Fire debuff (H) | Water debuff (I) | Gap | Line true (O) | Line false (P) |
-| 5 | Empty | Empty | Gap | Cone true (Q) | Cone false (R) |
+| Section, in order | Inputs, left to right |
+| --- | --- |
+| GC1 | Blue circle / red ?; early / late; bomb icon |
+| Water/Fire 1 | Blue circle / red ?; water icon / fire icon |
+| GC2 | Blue circle / red ?; bomb icon |
+| Water/Fire 2 | Blue circle / red ? |
+| Thunder line | Blue circle / red ? |
+| Ice cone | Blue circle / red ? |
+
+Group headings and early/late wording come directly from the original translation
+properties. Hover a button for its meaning. Selection is marked by a yellow
+border and blue background. Result headings and number/fire/water labels also
+come from the original Flow interface.
+
+The updated appearance defaults to opaque black backgrounds, white labels and
+bright yellow result text. Existing preferences are upgraded to an opaque
+background once; positions, sizes and language are retained. You can still
+adjust opacity in Settings afterwards. Result rows remain opaque for readability.
 
 Letters are source identifiers, not keyboard shortcuts. C/D also determine the
 complementary GC2 timing, exactly as in upstream. O/Q start selected; the final
@@ -113,13 +124,13 @@ dotnet run --project tests/OverlaySmokeTests -c Release
   These C# tests are supplied **but have not been executed there**. The Windows
   workflow must pass before treating this build as verified.
 - Static checks confirm XML validity, packaged image resources, all input
-  mappings, centre-gap geometry, and byte-for-byte preservation of the upstream
+  mappings, original Flow order and icons, and byte-for-byte preservation of the upstream
   Flow rule source. They do not independently validate FFXIV encounter strategy.
 
 ### Manual Windows acceptance checks
 
 1. Click inputs in the trigger window and confirm immediate results in the other.
-2. Move and resize the windows independently; confirm square tiles stay square.
+2. Move and resize the windows independently; confirm the Flow layout scales without reordering.
 3. Click `▣`: only one K icon remains. Click K: both windows return with selections.
 4. Drag K: it moves without expanding. Test its right-click recovery and exit.
 5. Select each language; check results, labels, and tooltips remain usable.

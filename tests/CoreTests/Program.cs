@@ -61,16 +61,20 @@ Directory.CreateDirectory(folder);
 try
 {
     var store = new SettingsStore(Path.Combine(folder,"settings.json"));
-    var settings = new UserSettings { Language=Lang.EN, Compact=true, BackgroundOpacity=.65,
+    var settings = new UserSettings { Language=Lang.EN, Compact=true, BackgroundOpacity=.65, AppearanceVersion=1,
         Triggers = new WindowPlacement { Left=-600, Top=80, Width=284, Height=318 } };
     store.Save(settings); Equal<string?>(null,store.LastError,"Save success");
     var loaded=store.Load(); Equal(Lang.EN,loaded.Language,"Stored language");
     Equal(true,loaded.Compact,"Stored compact state"); Equal(-600d,loaded.Triggers!.Left,"Negative monitor position");
     File.WriteAllText(store.FilePath,"not json");
     Equal(Lang.ZH,store.Load().Language,"Corrupt file fallback");
-    File.WriteAllText(store.FilePath,"{\"Language\":99,\"BackgroundOpacity\":-5}");
+    File.WriteAllText(store.FilePath,"{\"Language\":99,\"BackgroundOpacity\":-5,\"AppearanceVersion\":1}");
     loaded=store.Load(); Equal(Lang.ZH,loaded.Language,"Invalid language fallback");
     Equal(.2,loaded.BackgroundOpacity,"Opacity clamp");
+    File.WriteAllText(store.FilePath,"{\"BackgroundOpacity\":0.8,\"Compact\":true}");
+    loaded=store.Load(); Equal(1d,loaded.BackgroundOpacity,"Upgrade translucent theme");
+    Equal(true,loaded.Compact,"Upgrade retains compact preference");
+    Equal(1,loaded.AppearanceVersion,"Upgrade only applies once");
 }
 finally { Directory.Delete(folder,true); }
 Console.WriteLine($"PASS: {cases} mechanic combinations, toggles, translations and persistence.");

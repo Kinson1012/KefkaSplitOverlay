@@ -26,9 +26,10 @@ public sealed class HotbarTile
 public sealed class ResultItem : ViewModelBase
 {
  public string Label { get; }
+ public string? Header { get; }
  private string _answer = "—";
  public string Answer { get => _answer; set => Set(ref _answer, value); }
- public ResultItem(string label) => Label = label;
+ public ResultItem(string label, string? header = null) { Label = label; Header = header; }
 }
 public sealed class SplitOverlayViewModel : ViewModelBase
 {
@@ -36,6 +37,7 @@ public sealed class SplitOverlayViewModel : ViewModelBase
  public ObservableCollection<HotbarTile> Tiles { get; } = new();
  public ObservableCollection<ResultItem> Results { get; } = new();
  public Lang Language { get; private set; }
+ public Dictionary<int,string> FlowHeaders { get; } = new();
  public SplitOverlayViewModel(Lang lang)
  {
   Mechanic.PropertyChanged += (_, e) =>
@@ -47,40 +49,40 @@ public sealed class SplitOverlayViewModel : ViewModelBase
  public void SetLanguage(Lang lang)
  {
   Language = lang; Mechanic.UpdateLang(lang); Tiles.Clear(); Results.Clear();
-  string truth = L("真", "真", "True"), lie = L("假", "偽", "False");
   void Add(string key, string caption, string glyph, string description, int row, int col,
    P3ButtonViewModel state, string accent, string? image = null) =>
    Tiles.Add(new(key, caption, glyph, description, row, col, state, accent, image));
-  const string gc = "#D6B16D", element = "#E18D72", safe = "#89BDD3";
-  Add("A", "GC1", "✓", "GC1 · " + truth, 0, 0, Mechanic.BtnA, gc);
-  Add("B", "GC1", "✕", "GC1 · " + lie,   0, 1, Mechanic.BtnB, gc);
-  Add("J", "GC2", "✓", "GC2 · " + truth, 0, 3, Mechanic.BtnJ, gc);
-  Add("K", "GC2", "✕", "GC2 · " + lie,   0, 4, Mechanic.BtnK, gc);
-  Add("C", L("早", "早", "Short"), "1", L("GC1 早／GC2 晚", "GC1 早／GC2 遅", "GC1 short / GC2 long"), 1, 0, Mechanic.BtnC, gc);
-  Add("D", L("晚", "遅", "Long"), "2", L("GC1 晚／GC2 早", "GC1 遅／GC2 早", "GC1 long / GC2 short"), 1, 1, Mechanic.BtnD, gc);
-  Add("E", "GC1", "", L("炸彈來自 GC1", "爆弾は GC1", "Bomb from GC1"), 1, 3, Mechanic.BtnE, gc, "btn_el.png");
-  Add("L", "GC2", "", L("炸彈來自 GC2", "爆弾は GC2", "Bomb from GC2"), 1, 4, Mechanic.BtnL, gc, "btn_el.png");
-  string ef1 = L("水火1", "水炎1", "E/F 1"), ef2 = L("水火2", "水炎2", "E/F 2");
-  Add("F", ef1, "✓", ef1 + " · " + truth, 2, 0, Mechanic.BtnF, element);
-  Add("G", ef1, "✕", ef1 + " · " + lie,   2, 1, Mechanic.BtnG, element);
-  Add("M", ef2, "✓", ef2 + " · " + truth, 2, 3, Mechanic.BtnM, element);
-  Add("N", ef2, "✕", ef2 + " · " + lie,   2, 4, Mechanic.BtnN, element);
-  Add("H", L("火", "炎", "Fire"), "", L("火 debuff", "炎デバフ", "Fire debuff"), 3, 0, Mechanic.BtnH, element, "btn_h.png");
-  Add("I", L("水", "水", "Water"), "", L("水 debuff", "水デバフ", "Water debuff"), 3, 1, Mechanic.BtnI, element, "btn_i.png");
-  string line = L("雷線", "直線", "Line"), cone = L("冰扇", "扇", "Cone");
-  Add("O", line, "✓", line + " · " + truth, 3, 3, Mechanic.BtnO, safe);
-  Add("P", line, "✕", line + " · " + lie,   3, 4, Mechanic.BtnP, safe);
-  Add("Q", cone, "✓", cone + " · " + truth, 4, 3, Mechanic.BtnQ, safe);
-  Add("R", cone, "✕", cone + " · " + lie,   4, 4, Mechanic.BtnR, safe);
-  foreach (string label in new[] {
-   L("1 · 炸彈", "1 · 爆弾", "1 · Bomb"),
-   L("2 · 早水雷", "2 · 早 水雷", "2 · Short · water/lightning"),
-   L("3 · 早視線", "3 · 早 視線", "3 · Short · gaze"),
-   L("4 · 火", "4 · 炎", "4 · Fire"),
-   L("5 · 晚水雷", "5 · 遅 水雷", "5 · Long · water/lightning"),
-   L("6 · 晚視線", "6 · 遅 視線", "6 · Long · gaze"),
-   L("7 · 水", "7 · 水", "7 · Water"),
-   L("8 · 魔法放出", "8 · マジックアウト", "8 · Mana release") }) Results.Add(new(label));
+  const string accent = "#FFFFFF";
+  string truth=L("真", "真", "True"), lie=L("假", "偽", "False");
+  FlowHeaders.Clear();
+  FlowHeaders[0]=Mechanic.SecGC1; FlowHeaders[5]=Mechanic.SecWaterFire1;
+  FlowHeaders[9]=Mechanic.SecGC2; FlowHeaders[13]=Mechanic.SecWaterFire2;
+  FlowHeaders[16]=Mechanic.SecThunder; FlowHeaders[18]=Mechanic.SecIce;
+  Add("A", "", "●", Mechanic.SecGC1+" · "+truth, 1, 0, Mechanic.BtnA, accent);
+  Add("B", "", "?", Mechanic.SecGC1+" · "+lie, 1, 1, Mechanic.BtnB, accent);
+  Add("C", Mechanic.BtnCLabel, "", Mechanic.SecGC1+" · "+Mechanic.BtnCLabel, 2, 0, Mechanic.BtnC, accent);
+  Add("D", Mechanic.BtnDLabel, "", Mechanic.SecGC1+" · "+Mechanic.BtnDLabel, 2, 1, Mechanic.BtnD, accent);
+  Add("E", "", "", Mechanic.SecBomb+" · "+Mechanic.SecGC1, 3, 0, Mechanic.BtnE, accent, "btn_el.png");
+  Add("F", "", "●", Mechanic.SecWaterFire1+" · "+truth, 6, 0, Mechanic.BtnF, accent);
+  Add("G", "", "?", Mechanic.SecWaterFire1+" · "+lie, 6, 1, Mechanic.BtnG, accent);
+  // Water is on the left and fire on the right, exactly as in upstream Flow.
+  Add("I", "", "", L("水 debuff", "水デバフ", "Water debuff"), 7, 0, Mechanic.BtnI, accent, "btn_i.png");
+  Add("H", "", "", L("火 debuff", "炎デバフ", "Fire debuff"), 7, 1, Mechanic.BtnH, accent, "btn_h.png");
+  Add("J", "", "●", Mechanic.SecGC2+" · "+truth, 10, 0, Mechanic.BtnJ, accent);
+  Add("K", "", "?", Mechanic.SecGC2+" · "+lie, 10, 1, Mechanic.BtnK, accent);
+  Add("L", "", "", Mechanic.SecBomb+" · "+Mechanic.SecGC2, 11, 0, Mechanic.BtnL, accent, "btn_el.png");
+  Add("M", "", "●", Mechanic.SecWaterFire2+" · "+truth, 14, 0, Mechanic.BtnM, accent);
+  Add("N", "", "?", Mechanic.SecWaterFire2+" · "+lie, 14, 1, Mechanic.BtnN, accent);
+  Add("O", "", "●", Mechanic.SecThunder+" · "+truth, 17, 0, Mechanic.BtnO, accent);
+  Add("P", "", "?", Mechanic.SecThunder+" · "+lie, 17, 1, Mechanic.BtnP, accent);
+  Add("Q", "", "●", Mechanic.SecIce+" · "+truth, 19, 0, Mechanic.BtnQ, accent);
+  Add("R", "", "?", Mechanic.SecIce+" · "+lie, 19, 1, Mechanic.BtnR, accent);
+  for (int i=1;i<=8;i++)
+  {
+   string label=i==4 ? Mechanic.Num4Label : i==7 ? Mechanic.Num7Label : i+".";
+   string? header=i switch {1=>Mechanic.SecBomb,2=>Mechanic.SecEarly,5=>Mechanic.SecLate,8=>Mechanic.SecMagic,_=>null};
+   Results.Add(new(label,header));
+  }
   UpdateAnswers();
  }
  private void UpdateAnswers()

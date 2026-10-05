@@ -1,63 +1,65 @@
-// Added 2026-10-05. Five-column square hotbar, with a centre gap. GPL-3.0.
+// Modified 2026-10-06: restore upstream Flow order, text and icons in a compact panel. GPL-3.0.
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
 using UMADOverlay.ViewModels;
-
 namespace UMADOverlay.Views;
-
 public sealed class TriggerWindow : OverlayWindow
 {
-    private readonly Grid _hotbar = new() { Width = 262, Height = 276, Margin = new Thickness(4) };
-    private readonly SplitOverlayViewModel _vm;
-    public TriggerWindow(SplitOverlayViewModel vm) : base("KEFKA · INPUT", 284, 318)
-    {
-        _vm = vm; DataContext = vm;
-        MinWidth = 204; MinHeight = 228;
-        for (int i = 0; i < 5; i++)
-        {
-            _hotbar.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(52.4) });
-            _hotbar.RowDefinitions.Add(new RowDefinition { Height = new GridLength(55.2) });
-        }
-        SetBody(new Viewbox { Stretch = Stretch.Uniform, Margin = new Thickness(5), Child = _hotbar });
-        Rebuild();
-    }
-
-    public void Rebuild()
-    {
-        _hotbar.Children.Clear();
-        // Empty hotbar cells keep the compact silhouette without adding fake inputs.
-        for (int row = 0; row < 5; row++) for (int col = 0; col < 5; col++)
-        {
-            if (col == 2) continue;
-            var slot = new Border { Width = 48, Height = 48, CornerRadius = new CornerRadius(5),
-                Background = Brush("#222C34"), BorderBrush = Brush("#46555F"), BorderThickness = new Thickness(1), Opacity = 0.5 };
-            Grid.SetRow(slot,row); Grid.SetColumn(slot,col); _hotbar.Children.Add(slot);
-        }
-        foreach (var tile in _vm.Tiles)
-        {
-            var content = new StackPanel();
-            if (tile.ImagePath != null)
-                content.Children.Add(new Image { Source = new BitmapImage(new Uri(tile.ImagePath)), Height = 26, Stretch = Stretch.Uniform });
-            else content.Children.Add(new TextBlock { Text = tile.Glyph, FontSize = 23, FontWeight = FontWeights.Bold,
-                Height = 28, TextAlignment = TextAlignment.Center,
-                Foreground = tile.Glyph == "✕" ? Brush("#FFA3A3") : Brush("#F9E5AF") });
-            content.Children.Add(new TextBlock { Text = tile.Caption, FontSize = 9, TextAlignment = TextAlignment.Center });
-            var style = new Style(typeof(Button), (Style)Application.Current.FindResource(typeof(Button)));
-            style.Setters.Add(new Setter(BackgroundProperty, Brush("#35424C")));
-            style.Setters.Add(new Setter(BorderBrushProperty, tile.Accent));
-            var active = new DataTrigger { Binding = new Binding("State.IsActive"), Value = true };
-            active.Setters.Add(new Setter(BackgroundProperty, Brush("#536D87")));
-            active.Setters.Add(new Setter(BorderBrushProperty, Brush("#FFE4A3")));
-            active.Setters.Add(new Setter(BorderThicknessProperty, new Thickness(2)));
-            style.Triggers.Add(active);
-            var button = new Button { Width = 48, Height = 48, Padding = new Thickness(1), Content = content,
-                DataContext = tile, Style = style, ToolTip = tile.Description,
-                Command = _vm.Mechanic.CmdClick, CommandParameter = tile.Key };
-            System.Windows.Automation.AutomationProperties.SetName(button, tile.Description);
-            Grid.SetRow(button,tile.Row); Grid.SetColumn(button,tile.Column); _hotbar.Children.Add(button);
-        }
-    }
+ private readonly Grid _flow = new() { Width = 262, Height = 276 };
+ private readonly SplitOverlayViewModel _vm;
+ public TriggerWindow(SplitOverlayViewModel vm) : base("KEFKA · INPUT", 284, 318)
+ {
+  _vm=vm; DataContext=vm; MinWidth=204; MinHeight=228;
+  _flow.ColumnDefinitions.Add(new ColumnDefinition());
+  _flow.ColumnDefinitions.Add(new ColumnDefinition());
+  int[] headings=[0,5,9,13,16,18], dividers=[4,8,12,15];
+  for (int i=0;i<20;i++) _flow.RowDefinitions.Add(new RowDefinition {
+   Height=new GridLength(headings.Contains(i)?14:dividers.Contains(i)?2:18.4) });
+  SetBody(new Viewbox { Stretch=Stretch.Uniform, Margin=new Thickness(8,5,8,5), Child=_flow });
+  Rebuild();
+ }
+ public void Rebuild()
+ {
+  _flow.Children.Clear();
+  foreach (var heading in _vm.FlowHeaders)
+  {
+   var label=new TextBlock { Text=heading.Value, FontSize=11, FontWeight=FontWeights.Bold,
+    Foreground=Brush("#FFFFFF"), TextAlignment=TextAlignment.Center, VerticalAlignment=VerticalAlignment.Center };
+   Grid.SetRow(label,heading.Key); Grid.SetColumnSpan(label,2); _flow.Children.Add(label);
+  }
+  foreach (int row in new[]{4,8,12,15})
+  {
+   var line=new Border { Background=Brush("#FFFFFF"), Height=1, Margin=new Thickness(0) };
+   Grid.SetRow(line,row); Grid.SetColumnSpan(line,2); _flow.Children.Add(line);
+  }
+  foreach (var tile in _vm.Tiles)
+  {
+   UIElement content;
+   if (tile.ImagePath!=null)
+    content=new Image { Source=new BitmapImage(new Uri(tile.ImagePath)), Height=16, Stretch=Stretch.Uniform };
+   else if (tile.Glyph=="●") content=new Ellipse { Width=14, Height=14, Fill=Brush("#4DADFF") };
+   else content=new TextBlock { Text=tile.Glyph=="?"?"?":tile.Caption, FontSize=14,
+    FontWeight=FontWeights.Bold, Foreground=tile.Glyph=="?"?Brush("#FF4D4D"):Brush("#FFFFFF"),
+    TextAlignment=TextAlignment.Center, VerticalAlignment=VerticalAlignment.Center };
+   var style=new Style(typeof(Button),(Style)Application.Current.FindResource(typeof(Button)));
+   style.Setters.Add(new Setter(BackgroundProperty,Brush("#141414")));
+   style.Setters.Add(new Setter(BorderBrushProperty,Brush("#CCCCCC")));
+   var active=new DataTrigger { Binding=new Binding("State.IsActive"), Value=true };
+   active.Setters.Add(new Setter(BackgroundProperty,Brush("#003C70")));
+   active.Setters.Add(new Setter(BorderBrushProperty,Brush("#FFFF00")));
+   active.Setters.Add(new Setter(BorderThicknessProperty,new Thickness(2)));
+   style.Triggers.Add(active);
+   var button=new Button { Margin=new Thickness(1,0,1,1), Padding=new Thickness(0), Content=content,
+    DataContext=tile, Style=style, ToolTip=tile.Description,
+    Command=_vm.Mechanic.CmdClick, CommandParameter=tile.Key };
+   System.Windows.Automation.AutomationProperties.SetName(button,tile.Description);
+   Grid.SetRow(button,tile.Row); Grid.SetColumn(button,tile.Column);
+   if (tile.Key is "E" or "L") Grid.SetColumnSpan(button,2);
+   _flow.Children.Add(button);
+  }
+ }
 }

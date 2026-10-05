@@ -9,8 +9,9 @@ public sealed class WindowPlacement
 }
 public sealed class UserSettings
 {
+ public int AppearanceVersion { get; set; }
  public Lang Language { get; set; } = Lang.ZH;
- public double BackgroundOpacity { get; set; } = 0.80;
+ public double BackgroundOpacity { get; set; } = 1.0;
  public bool LayoutLocked { get; set; }
  public bool Compact { get; set; }
  public WindowPlacement? Triggers { get; set; }

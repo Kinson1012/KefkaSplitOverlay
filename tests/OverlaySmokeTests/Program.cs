@@ -1,6 +1,7 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Threading;
+using System.Windows.Media.Imaging;
 using UMADOverlay;
 using UMADOverlay.Models;
 using UMADOverlay.Services;
@@ -10,6 +11,16 @@ internal static class Program
 {
     private static void Check(bool condition,string message) { if (!condition) throw new Exception(message); }
     private static void Pump() => Application.Current.Dispatcher.Invoke(() => { },DispatcherPriority.ApplicationIdle);
+    private static void Capture(OverlayWindow window, string name)
+    {
+        window.UpdateLayout();
+        var image = new RenderTargetBitmap((int)Math.Ceiling(window.ActualWidth),
+            (int)Math.Ceiling(window.ActualHeight),96,96,System.Windows.Media.PixelFormats.Pbgra32);
+        image.Render(window);
+        var png = new PngBitmapEncoder(); png.Frames.Add(BitmapFrame.Create(image));
+        Directory.CreateDirectory("dist/preview");
+        using var stream = File.Create(Path.Combine("dist/preview",name+".png")); png.Save(stream);
+    }
     [STAThread]
     private static int Main()
     {
@@ -27,10 +38,14 @@ internal static class Program
             var vm=controller.ViewModel;
             Check(vm.Tiles.Count==18,"All 18 original inputs must be reachable");
             Check(vm.Tiles.Select(t=>(t.Row,t.Column)).Distinct().Count()==18,"No overlapping tiles");
-            Check(vm.Tiles.All(t=>t.Column!=2),"Centre column must remain empty");
+            Check(string.Join("",vm.Tiles.Select(t=>t.Key))=="ABCDEFGIHJKLMNOPQR","Original Flow input order");
+            Check(vm.Tiles.Where(t=>t.Key is "A" or "F" or "J" or "M" or "O" or "Q").All(t=>t.Glyph=="●"),"Original blue-circle icons");
+            Check(vm.Tiles.Where(t=>t.Key is "B" or "G" or "K" or "N" or "P" or "R").All(t=>t.Glyph=="?"),"Original question-mark icons");
+            Check(controller.Settings.BackgroundOpacity==1.0,"Opaque high-contrast default");
             vm.Mechanic.CmdClick.Execute("A");
             vm.Mechanic.CmdClick.Execute("E");
             Check(vm.Results[0].Answer=="不要動","Result window must share the trigger state");
+            Capture(trigger,"Input"); Capture(results,"Results");
             double width=trigger.Width;
             controller.Collapse(); Pump();
             var icon=app.Windows.OfType<LauncherWindow>().Single();
