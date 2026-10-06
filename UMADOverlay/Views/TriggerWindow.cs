@@ -35,6 +35,7 @@ public sealed class TriggerWindow : OverlayWindow
    FontSize=tile.Glyph=="?"?25:16, FontWeight=FontWeights.Bold,
    Foreground=tile.Glyph=="?"?Brush("#FF4D4D"):Brush("#FFFFFF"),
    TextAlignment=TextAlignment.Center, VerticalAlignment=VerticalAlignment.Center };
+  if (key is "C" or "D") content=new Viewbox { Stretch=Stretch.Uniform, StretchDirection=StretchDirection.DownOnly, Margin=new Thickness(2,0,2,0), Child=content };
   var style=new Style(typeof(Button),(Style)Application.Current.FindResource(typeof(Button)));
   style.Setters.Add(new Setter(BackgroundProperty,Brush("#141414")));
   style.Setters.Add(new Setter(BorderBrushProperty,Brush("#CCCCCC")));

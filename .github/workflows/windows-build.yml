@@ -4,7 +4,7 @@ on:
   pull_request:
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 jobs:
   build:
     runs-on: windows-latest
@@ -24,15 +24,43 @@ jobs:
       - name: Include licence, attribution and corresponding source
         shell: pwsh
         run: |
-          Copy-Item LICENSE,NOTICE.md,README.md,UPSTREAM-README.md dist/app/
-          git archive --format=zip --output=dist/app/Corresponding-Source.zip HEAD
+          New-Item -ItemType Directory -Path dist/package -Force
+          Copy-Item dist/app/KefkaSplitOverlay.exe dist/package/
+          git archive --format=zip --output=dist/package/Corresponding-Source.zip HEAD
       - uses: actions/upload-artifact@v4
         with:
           name: KefkaSplitOverlay-Windows-x64
-          path: dist/app/
+          path: dist/package/
           if-no-files-found: error
       - uses: actions/upload-artifact@v4
         with:
           name: KefkaSplitOverlay-Preview
           path: dist/preview/
           if-no-files-found: error
+      - name: Publish v1.0.1 release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[release v1.0.1]')
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Compress-Archive -Path dist/package/* -DestinationPath dist/KefkaSplitOverlay-v1.0.1-Windows-x64.zip
+          @'
+          - Added 早(50s) and 晚(1m) timing remarks to the input buttons.
+          - Replaced the minimized K icon with the supplied red question-mark image.
+          - Simplified the download ZIP to only KefkaSplitOverlay.exe and Corresponding-Source.zip.
+          - Licence, attribution, and the Traditional Chinese tutorial are included in the source ZIP.
+
+          Extract the ZIP and run KefkaSplitOverlay.exe. No separate .NET runtime installation is required.
+          Windows build, mechanic/settings tests, and WPF smoke tests passed before publishing.
+          '@ | Set-Content dist/release-notes.md -Encoding utf8
+          gh release view v1.0.1 *> $null
+          if ($LASTEXITCODE -ne 0) {
+            gh release create v1.0.1 --target $env:GITHUB_SHA --title "v1.0.1 — Timing remarks and question-mark icon" --notes-file dist/release-notes.md --draft
+            if ($LASTEXITCODE -ne 0) { throw 'Release creation failed' }
+          }
+          gh release upload v1.0.1 dist/KefkaSplitOverlay-v1.0.1-Windows-x64.zip --clobber
+          if ($LASTEXITCODE -ne 0) { throw 'Release asset upload failed' }
+          gh release edit v1.0.1 --draft=false --latest
+          if ($LASTEXITCODE -ne 0) { throw 'Release publication failed' }

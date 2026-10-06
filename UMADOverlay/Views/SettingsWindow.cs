@@ -40,7 +40,7 @@ public sealed class SettingsWindow : Window
         }
         Action("Recover positions / 重置視窗位置及大小", controller.RecoverPositions);
         Action("Collapse to icon / 縮成圖示", controller.Collapse);
-        Label("Drag either title bar to move it. Drag its edges to resize.\n拖動標題列移動；拖動邊緣調整大小。\n\nClick the K icon to restore both windows. Drag the icon to move it.\n點擊 K 圖示同時展開兩個視窗；拖動圖示可移動。\n\nBlue circle = true · Red ? = false. Hover a tile for its mechanic.\n藍色圓形 = 真 · 紅色 ? = 假；滑鼠停留可查看按鈕說明。\n\nAdapted from AweiYourdog/FF14-Kefka-P4-for-PC · GPL-3.0.\nNo warranty. See LICENSE and NOTICE in the source package.");
+        Label("Drag either title bar to move it. Drag its edges to resize.\n拖動標題列移動；拖動邊緣調整大小。\n\nClick the question-mark icon to restore both windows. Drag the icon to move it.\n點擊紅色問號圖示同時展開兩個視窗；拖動圖示可移動。\n\nBlue circle = true · Red ? = false. Hover a tile for its mechanic.\n藍色圓形 = 真 · 紅色 ? = 假；滑鼠停留可查看按鈕說明。\n\nAdapted from AweiYourdog/FF14-Kefka-P4-for-PC · GPL-3.0.\nNo warranty. See LICENSE and NOTICE in the source package.");
         if (controller.SettingsError != null) Label(controller.SettingsError);
         Action("Close settings / 關閉設定", Close);
         Action("Exit application / 結束程式", controller.Exit);

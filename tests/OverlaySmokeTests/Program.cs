@@ -49,6 +49,7 @@ internal static class Program
             Check(bombs.Length==2 && bombs.All(b=>System.Windows.Controls.Grid.GetColumn(b)==2),"Separate right-side bomb column");
             Check((string)bombs[0].CommandParameter=="E" && (string)bombs[1].CommandParameter=="L","Bombs retain GC1/GC2 order");
             Check(layout.Children.OfType<System.Windows.Controls.Border>().Count()==6,"Six mechanic groups");
+            Check(vm.Tiles.Single(t=>t.Key=="C").Caption=="早(50s)" && vm.Tiles.Single(t=>t.Key=="D").Caption=="晚(1m)","Early/late timing remarks");
             vm.Mechanic.CmdClick.Execute("A");
             vm.Mechanic.CmdClick.Execute("E");
             Check(vm.Results[0].Answer=="不要動","Result window must share the trigger state");
@@ -58,6 +59,11 @@ internal static class Program
             var icon=app.Windows.OfType<LauncherWindow>().Single();
             Check(icon.IsVisible && !trigger.IsVisible && !results.IsVisible,"Only icon is visible when compact");
             Check(icon.Width==48 && icon.Height==48,"Launcher must remain icon-sized");
+            var iconRoot=(System.Windows.Controls.Grid)((System.Windows.Controls.Border)icon.Content).Child;
+            var iconSurface=iconRoot.Children.OfType<System.Windows.Controls.Grid>().Single(g=>System.Windows.Controls.Grid.GetRow(g)==1);
+            var iconImage=iconSurface.Children.OfType<System.Windows.Controls.Image>().Single();
+            Check(((BitmapImage)iconImage.Source).UriSource.ToString().EndsWith("Assets/launcher_question.png"),"Supplied question-mark icon resource");
+            Capture(icon,"Launcher");
             controller.Expand(); Pump();
             Check(trigger.IsVisible && results.IsVisible && !icon.IsVisible,"Both windows restore together");
             Check(trigger.Width==width && vm.Mechanic.BtnA.IsActive,"Restore retains geometry and selections");

@@ -2,6 +2,8 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace UMADOverlay.Views;
 
@@ -13,10 +15,12 @@ public sealed class LauncherWindow : OverlayWindow
     public event Action? RestoreRequested;
     public LauncherWindow() : base("Kefka · restore both overlays", 48, 48, launcher: true)
     {
-        _surface = new Grid { Background = Brush("#263441"), Cursor = Cursors.Hand,
+        _surface = new Grid { Background = Brush("#000000"), Cursor = Cursors.Hand,
             ToolTip = "Click: restore both overlays · Drag: move · Right-click: options" };
-        _surface.Children.Add(new TextBlock { Text = "K", FontSize = 27, FontWeight = FontWeights.Bold,
-            Foreground = Brush("#F2D69C"), HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center });
+        _surface.Children.Add(new Image {
+            Source = new BitmapImage(new Uri("pack://application:,,,/KefkaSplitOverlay;component/Assets/launcher_question.png")),
+            Stretch = Stretch.Uniform, Margin = new Thickness(2),
+            HorizontalAlignment = HorizontalAlignment.Stretch, VerticalAlignment = VerticalAlignment.Stretch });
         SetBody(_surface);
         _surface.MouseLeftButtonDown += (_, e) =>
         { _down = PointToScreen(e.GetPosition(this)); _pressed = true; _surface.CaptureMouse(); e.Handled = true; };

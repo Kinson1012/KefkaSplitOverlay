@@ -60,8 +60,8 @@ public sealed class SplitOverlayViewModel : ViewModelBase
   FlowHeaders[16]=Mechanic.SecThunder; FlowHeaders[18]=Mechanic.SecIce;
   Add("A", "", "●", Mechanic.SecGC1+" · "+truth, 1, 0, Mechanic.BtnA, accent);
   Add("B", "", "?", Mechanic.SecGC1+" · "+lie, 1, 1, Mechanic.BtnB, accent);
-  Add("C", Mechanic.BtnCLabel, "", Mechanic.SecGC1+" · "+Mechanic.BtnCLabel, 2, 0, Mechanic.BtnC, accent);
-  Add("D", Mechanic.BtnDLabel, "", Mechanic.SecGC1+" · "+Mechanic.BtnDLabel, 2, 1, Mechanic.BtnD, accent);
+  Add("C", Mechanic.BtnCLabel+"(50s)", "", Mechanic.SecGC1+" · "+Mechanic.BtnCLabel+" (50s)", 2, 0, Mechanic.BtnC, accent);
+  Add("D", Mechanic.BtnDLabel+"(1m)", "", Mechanic.SecGC1+" · "+Mechanic.BtnDLabel+" (1m)", 2, 1, Mechanic.BtnD, accent);
   Add("E", "", "", Mechanic.SecBomb+" · "+Mechanic.SecGC1, 3, 0, Mechanic.BtnE, accent, "btn_el.png");
   Add("F", "", "●", Mechanic.SecWaterFire1+" · "+truth, 6, 0, Mechanic.BtnF, accent);
   Add("G", "", "?", Mechanic.SecWaterFire1+" · "+lie, 6, 1, Mechanic.BtnG, accent);
