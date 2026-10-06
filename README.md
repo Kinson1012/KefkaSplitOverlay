@@ -108,6 +108,6 @@ GC、水火、早／晚及炸彈按鈕可再次點擊以取消選取。雷直線
 
 ## 來源及授權
 
-改編自 [AweiYourdog / FF14-Kefka-P4-for-PC](https://github.com/AweiYourdog/FF14-Kefka-P4-for-PC)，採用 **GPL-3.0** 授權。原作者聲明與修改說明見 [NOTICE.md](NOTICE.md)，授權全文見 [LICENSE](LICENSE)。
+改編自 [AweiYourdog / FF14-Kefka-P4-for-PC](https://github.com/AweiYourdog/FF14-Kefka-P4-for-PC)，採用 **GPL-3.0** 授權。原作者聲明與修改說明見 [NOTICE.md](docs/NOTICE.md)，授權全文見 [LICENSE](LICENSE)。
 
 發布套件附有對應原始碼 `Corresponding-Source.zip`。
