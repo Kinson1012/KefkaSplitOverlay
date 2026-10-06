@@ -1,0 +1,80 @@
+name: Security audit v1.0.1
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/security-audit-v1.0.1.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 9eb825acb48955632b8f96f7e0f1eb4019a993f3
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Check dependency advisories
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory audit -Force
+          dotnet restore UMADOverlay.sln
+          if ($LASTEXITCODE -ne 0) { throw 'Restore failed' }
+          dotnet list UMADOverlay.sln package --vulnerable --include-transitive 2>&1 | Tee-Object audit/dependencies.txt
+          if ($LASTEXITCODE -ne 0) { throw 'Dependency query failed' }
+      - name: Verify exact published release and source
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          gh release download v1.0.1 --pattern KefkaSplitOverlay-v1.0.1-Windows-x64.zip --dir audit/download
+          if ($LASTEXITCODE -ne 0) { throw 'Release download failed' }
+          $zip = 'audit/download/KefkaSplitOverlay-v1.0.1-Windows-x64.zip'
+          $hash = (Get-FileHash $zip -Algorithm SHA256).Hash.ToLowerInvariant()
+          "Release ZIP SHA256: $hash" | Tee-Object audit/integrity.txt
+          if ($hash -ne '8b80c42304287d4e3c5003905e85a43ca0e4683f900c1acf31194769f96f3ee4') { throw 'Release ZIP hash mismatch' }
+          $archive = [System.IO.Compression.ZipFile]::OpenRead((Resolve-Path $zip))
+          try {
+            $names = @($archive.Entries.FullName | Sort-Object)
+            $names | Out-File audit/package-contents.txt
+            if (($names -join ',') -ne 'Corresponding-Source.zip,KefkaSplitOverlay.exe') { throw 'Unexpected package contents' }
+          } finally { $archive.Dispose() }
+          Expand-Archive $zip audit/release
+          Expand-Archive audit/release/Corresponding-Source.zip audit/source
+          foreach ($file in (git ls-files)) {
+            $original = (Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash
+            $included = (Get-FileHash -LiteralPath (Join-Path audit/source $file) -Algorithm SHA256).Hash
+            if ($original -ne $included) { throw "Source mismatch: $file" }
+          }
+          'PASS: included source matches the release commit.' | Tee-Object -Append audit/integrity.txt
+          Get-FileHash audit/release/KefkaSplitOverlay.exe -Algorithm SHA256 | Format-List | Out-File -Append audit/integrity.txt
+          Get-AuthenticodeSignature audit/release/KefkaSplitOverlay.exe | Format-List Status,StatusMessage,SignerCertificate | Out-File audit/signature.txt
+      - name: Scan release and source with Microsoft Defender
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Get-MpComputerStatus | Format-List * | Out-File audit/defender-before.txt
+          $scanner = Get-ChildItem "$env:ProgramData/Microsoft/Windows Defender/Platform/*/MpCmdRun.exe" -ErrorAction SilentlyContinue | Sort-Object FullName -Descending | Select-Object -First 1
+          $scannerPath = if ($scanner) { $scanner.FullName } else { "$env:ProgramFiles/Windows Defender/MpCmdRun.exe" }
+          if (!(Test-Path $scannerPath)) { throw 'Microsoft Defender scanner unavailable; no clean verdict can be issued.' }
+          & $scannerPath -SignatureUpdate 2>&1 | Tee-Object audit/defender-update.txt
+          if ($LASTEXITCODE -ne 0) { throw 'Defender signature update failed; scan not verified.' }
+          Get-MpComputerStatus | Format-List * | Out-File audit/defender-status.txt
+          & $scannerPath -Scan -ScanType 3 -File (Resolve-Path audit/release).Path -DisableRemediation 2>&1 | Tee-Object audit/defender-release.txt
+          $releaseExit = $LASTEXITCODE
+          & $scannerPath -Scan -ScanType 3 -File (Resolve-Path audit/source).Path -DisableRemediation 2>&1 | Tee-Object audit/defender-source.txt
+          $sourceExit = $LASTEXITCODE
+          "Release scan exit: $releaseExit; source scan exit: $sourceExit" | Tee-Object audit/defender-result.txt
+          Get-MpThreatDetection | Format-List * | Out-File audit/defender-detections.txt
+          if ($releaseExit -ne 0 -or $sourceExit -ne 0) { throw 'Defender scan did not return clean success; inspect logs.' }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Security-audit-v1.0.1
+          path: audit/*.txt
+          if-no-files-found: error
